@@ -1,13 +1,4 @@
-# Python
+.env
+backend/.env
 venv/
 __pycache__/
-*.pyc
-
-# Environment variables
-.env
-
-# OS files
-.DS_Store
-
-# VS Code
-.vscode/
