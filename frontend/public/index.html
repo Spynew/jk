@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.S BAGS - Online Store</title>
+    <link rel="stylesheet" href="../css/UserPannel.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+</head>
+<body>
+    <!-- Top Banner -->
+    <div class="top-banner">
+        <div class="container">
+            <p><i class="fas fa-truck"></i> Free Shipping on Orders Above Rs. 5000 | <i class="fas fa-shield-alt"></i> 100% Authentic Products</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <img src="../assets/images/logo.jpg" alt="S.S BAGS Logo" class="logo-img">
+                <span>S.S BAGS</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" onclick="showSection('home')">Home</a></li>
+                <li><a href="#products" onclick="showSection('products')">Shop</a></li>
+                <li><a href="#collections" onclick="showSection('collections')">Collections</a></li>
+                <li><a href="#cart" onclick="showSection('cart')">Cart <span id="cart-count" class="cart-badge">0</span></a></li>
+                <li><a href="#orders" onclick="showSection('orders')">Orders</a></li>
+                <li id="auth-link"><a href="#auth" onclick="showSection('auth')">Login</a></li>
+                <li id="logout-link" style="display:none;"><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i data-feather="menu"></i>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="hero-container">
+                <div class="hero-slider">
+                    <div class="hero-slide active">
+                        <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1920&q=80" alt="Premium Backpacks">
+                        <div class="hero-overlay">
+                            <div class="hero-content">
+                                <span class="badge">New Arrival 2026</span>
+                                <h1>Elevate Your Style With <br><span>S.S BAGS</span></h1>
+                                <p>Discover perfect blend of luxury, durability, and elegance.</p>
+                                <div class="hero-btns">
+                                    <button class="btn btn-primary btn-lg" onclick="showSection('products')">
+                                        Shop Now <i data-feather="arrow-right"></i>
+                                    </button>
+                                    <button class="btn btn-outline-light btn-lg" onclick="showSection('collections')">
+                                        View Collections
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Indicators -->
+                <div class="hero-indicators">
+                    <span class="indicator active" onclick="currentSlide(1)"></span>
+                    <span class="indicator" onclick="currentSlide(2)"></span>
+                    <span class="indicator" onclick="currentSlide(3)"></span>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-section">
+                <video class="features-video" autoplay muted loop playsinline>
+                    <source src="Images/background.mp4" type="video/mp4">
+                </video>
+                <div class="features-header">
+                    <h2>Why Choose Us?</h2>
+                    <p>Experience the best of S.S BAGS with our exclusive features</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-feather="truck"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Free Delivery</h4>
+                            <p>On orders over Rs. 5000</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-feather="shield"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Premium Quality</h4>
+                            <p>100% Genuine Materials</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-feather="refresh-cw"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Easy Returns</h4>
+                            <p>7 Days Return Policy</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-feather="headphones"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>24/7 Support</h4>
+                            <p>Dedicated Customer Service</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trending-header">
+                <h2>Shop By Category</h2>
+                <div class="line"></div>
+            </div>
+            <div class="category-grid">
+                <!-- Categories will be loaded dynamically from API -->
+            </div>
+        </section>
+
+        <!-- Authentication Section -->
+        <section id="auth" class="section">
+            <div id="auth-section">
+                <div class="auth-card">
+                    <!-- Brand Logo -->
+                    <img src="Images/logo.jpg" alt="S.S BAGS Logo" class="auth-logo">
+                    
+                    <div id="login-form">
+                        <h2>Welcome Back!</h2>
+                        <p>Bag the best deals today 🎒</p>
+                        <div class="input-group">
+                            <i data-feather="mail" class="input-icon"></i>
+                            <input type="email" id="login-email" placeholder="Email Address">
+                        </div>
+                        <div class="input-group">
+                            <i data-feather="lock" class="input-icon"></i>
+                            <input type="password" id="login-password" placeholder="Password">
+                        </div>
+                        <button class="auth-btn" onclick="login()">Login to Shop</button>
+                        <div class="toggle-auth">
+                            New here? <a href="#" onclick="toggleAuth('register')">Create an Account</a>
+                        </div>
+                    </div>
+
+                    <div id="register-form" style="display:none;">
+                        <h2>Join S.S BAGS</h2>
+                        <p>Start your premium journey</p>
+                        <div class="input-group">
+                            <i data-feather="mail" class="input-icon"></i>
+                            <input type="email" id="reg-email" placeholder="Email Address">
+                        </div>
+                        <div class="input-group">
+                            <i data-feather="lock" class="input-icon"></i>
+                            <input type="password" id="reg-password" placeholder="Password">
+                        </div>
+                        <div class="input-group">
+                            <i data-feather="lock" class="input-icon"></i>
+                            <input type="password" id="reg-confirm" placeholder="Confirm Password">
+                        </div>
+                        <button class="auth-btn" onclick="register()">Create Account</button>
+                        <div class="toggle-auth">
+                            Already a member? <a href="#" onclick="toggleAuth('login')">Login Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="section">
+            <div class="products-header">
+                <h2>Products</h2>
+                <div class="filters">
+                    <input type="text" id="search-input" placeholder="Search bags..." onkeyup="filterProducts()">
+                    <select id="category-filter" onchange="filterProducts()">
+                        <option value="">All Categories</option>
+                        <option value="Handbags">Handbags</option>
+                        <option value="Backpacks">Backpacks</option>
+                        <option value="Wallets">Wallets</option>
+                        <option value="Travel Bags">Travel Bags</option>
+                        <option value="Crossbody Bags">Crossbody Bags</option>
+                        <option value="Laptop Bags">Laptop Bags</option>
+                        <option value="Duffel Bags">Duffel Bags</option>
+                        <option value="Clutch Bags">Clutch Bags</option>
+                        <option value="Tote Bags">Tote Bags</option>
+                        <option value="Messenger Bags">Messenger Bags</option>
+                        <option value="Sling Bags">Sling Bags</option>
+                        <option value="Briefcases">Briefcases</option>
+                        <option value="School Bags">School Bags</option>
+                        <option value="Sports Bags">Sports Bags</option>
+                        <option value="Fashion Bags">Fashion Bags</option>
+                        <option value="Business Bags">Business Bags</option>
+                        <option value="Casual Bags">Casual Bags</option>
+                        <option value="Luxury Bags">Luxury Bags</option>
+                    </select>
+                    <select id="sort-filter" onchange="filterProducts()">
+                        <option value="">Sort By</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">Newest</option>
+                    </select>
+                </div>
+            </div>
+            <div id="products-list" class="products-grid"></div>
+        </section>
+
+        <!-- Cart Section -->
+        <section id="cart" class="section">
+            <div class="cart-layout">
+                <div class="cart-items-container">
+                    <h2>Your Shopping Bag <i data-feather="shopping-bag"></i></h2>
+                    <div id="cart-items">
+                    </div>
+                </div>
+                
+                <div class="cart-summary-card">
+                    <h3>Order Summary</h3>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal">Rs. 0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Delivery</span>
+                        <span id="delivery" class="free-delivery">FREE</span>
+                    </div>
+                    <hr>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="total">Rs. 0</span>
+                    </div>
+                    <button onclick="proceedToOrder()" class="checkout-btn">
+                        Place Order via WhatsApp <i data-feather="message-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Orders Section -->
+        <section id="orders" class="section">
+            <h2>My Orders</h2>
+            <div id="orders-list" class="orders-list"></div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <img src="Images/logo.jpg" alt="S.S BAGS Logo" class="footer-logo-img">
+                    <h3>S.S BAGS</h3>
+                </div>
+                <p>Your trusted destination for premium quality bags.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#" onclick="showSection('home')">Home</a></li>
+                    <li><a href="#" onclick="showSection('products')">Shop</a></li>
+                    <li><a href="#" onclick="showSection('collections')">Collections</a></li>
+                    <li><a href="#" onclick="showSection('orders')">Track Order</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Customer Service</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Shipping Info</a></li>
+                    <li><a href="#">Returns & Exchanges</a></li>
+                    <li><a href="#">Size Guide</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-phone"></i> +92 315 0024508</p>
+                <p><i class="fas fa-envelope"></i> khanmkmeer@gmail.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> Shop MA Jinnah road Maryam Market Shop 43</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 S.S BAGS. All rights reserved. Designed with ❤️ in Pakistan</p>
+        </div>
+    </footer>
+
+    <script src="../js/UserPannel.js"></script>
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+    </script>
+</body>
+</html>

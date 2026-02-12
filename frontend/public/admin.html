@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - S.S BAGS</title>
+    <link rel="stylesheet" href="../css/AdminPannel.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+</head>
+<body>
+    <!-- Top Banner -->
+    <div class="top-banner">
+        <div class="container">
+            <p><i class="fas fa-shield-alt"></i> Admin Panel - Secure Management System | <i class="fas fa-cog"></i> System Status: Online</p>
+        </div>
+    </div>
+
+    <!-- Login Section -->
+    <section id="login-section" class="login-container">
+        <div class="login-box">
+            <!-- Brand Logo -->
+            <img src="Images/logo.jpg" alt="S.S BAGS Logo" class="auth-logo">
+            
+            <h2>Admin Access</h2>
+            <p>Secure management portal </p>
+            <div class="error-message" id="login-error"></div>
+            <div class="input-group">
+                <i data-feather="mail" class="input-icon"></i>
+                <input type="email" id="admin-email" placeholder="Admin Email" required>
+            </div>
+            <div class="input-group">
+                <i data-feather="lock" class="input-icon"></i>
+                <input type="password" id="admin-password" placeholder="Password" required>
+            </div>
+            <button onclick="adminLogin()" class="auth-btn" id="login-btn">Login to Admin Panel</button>
+        </div>
+    </section>
+
+    <!-- Admin Dashboard -->
+    <section id="admin-section" style="display:none;">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <img src="Images/logo.jpg" alt="S.S BAGS" class="logo-img">
+                    <span>S.S BAGS Admin</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#" onclick="showAdminSection('dashboard', event)" class="active">Dashboard</a></li>
+                    <li><a href="#" onclick="showAdminSection('products', event)">Products</a></li>
+                    <li><a href="#" onclick="showAdminSection('orders', event)">Orders</a></li>
+                    <li><a href="#" onclick="showAdminSection('customers', event)">Customers</a></li>
+                    <li><a href="#" onclick="showAdminSection('reports', event)">Reports</a></li>
+                    <li><a href="#" onclick="adminLogout()">Logout</a></li>
+                </ul>
+                <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                    <i data-feather="menu"></i>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container">
+            <!-- Dashboard -->
+            <div id="dashboard" class="admin-section active">
+                <div class="page-header">
+                    <h1>Admin Dashboard</h1>
+                    <p>Manage your S.S BAGS store efficiently</p>
+                </div>
+                
+                <div class="features-section">
+                    <div class="features-header">
+                        <h2>Store Overview</h2>
+                        <p>Real-time business metrics and performance indicators</p>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i data-feather="users"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>Total Users</h4>
+                                <p id="stat-users">0</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i data-feather="shopping-bag"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>Total Products</h4>
+                                <p id="stat-products">0</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i data-feather="package"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>Total Orders</h4>
+                                <p id="stat-orders">0</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i data-feather="trending-up"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>Total Sales</h4>
+                                <p id="stat-sales">Rs. 0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recent-orders">
+                    <div class="trending-header">
+                        <h2>Recent Orders</h2>
+                        <div class="line"></div>
+                    </div>
+                    <div id="recent-orders-list"></div>
+                </div>
+            </div>
+
+            <!-- Products Management -->
+            <div id="products" class="admin-section">
+                <div class="page-header">
+                    <h1>Product Management</h1>
+                    <p>Add, edit, and manage your product inventory</p>
+                </div>
+                
+                <div class="product-actions">
+                    <button onclick="toggleProductForm()" class="btn btn-primary"><i data-feather="plus"></i> Add New Product</button>
+                </div>
+
+                <div id="product-form" class="form-section" style="display:none;">
+                    <h2>Add/Edit Product</h2>
+                    <input type="hidden" id="product-id">
+                    <input type="text" id="product-name" placeholder="Product Name">
+                    <input type="text" id="product-description" placeholder="Description">
+                    <input type="number" id="product-price" placeholder="Price (PKR)">
+                    <input type="number" id="product-stock" placeholder="Stock Quantity">
+                    <select id="product-category">
+                        <option value="">Select Category</option>
+                        <option value="Handbags">Handbags</option>
+                        <option value="Backpacks">Backpacks</option>
+                        <option value="Wallets">Wallets</option>
+                        <option value="Travel Bags">Travel Bags</option>
+                        <option value="Crossbody Bags">Crossbody Bags</option>
+                        <option value="Laptop Bags">Laptop Bags</option>
+                        <option value="Duffel Bags">Duffel Bags</option>
+                        <option value="Clutch Bags">Clutch Bags</option>
+                        <option value="Tote Bags">Tote Bags</option>
+                        <option value="Messenger Bags">Messenger Bags</option>
+                        <option value="Sling Bags">Sling Bags</option>
+                        <option value="Briefcases">Briefcases</option>
+                        <option value="School Bags">School Bags</option>
+                        <option value="Sports Bags">Sports Bags</option>
+                        <option value="Fashion Bags">Fashion Bags</option>
+                        <option value="Business Bags">Business Bags</option>
+                        <option value="Casual Bags">Casual Bags</option>
+                        <option value="Luxury Bags">Luxury Bags</option>
+                    </select>
+                    <input type="text" id="product-color" placeholder="Color (optional)">
+                    <input type="text" id="product-material" placeholder="Material (optional)">
+                    <input type="text" id="product-size" placeholder="Size (optional)">
+                    
+                    <!-- Image Upload Section -->
+                    <div class="image-upload-section">
+                        <label>Upload Product Images (Max 5):</label>
+                        <input type="file" id="product-images" accept="image/*" multiple>
+                        <small>Choose up to 5 images for your product</small>
+                        
+                        <!-- Preview Container -->
+                        <div id="image-preview-container" class="image-preview-container"></div>
+                    </div>
+                    
+                    <button onclick="saveProduct()" class="btn btn-primary">Save Product</button>
+                    <button onclick="toggleProductForm()" class="btn">Cancel</button>
+                </div>
+
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price (Rs.)</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Orders Management -->
+            <div id="orders" class="admin-section">
+                <div class="page-header">
+                    <h1>Order Management</h1>
+                    <p>Track and manage customer orders</p>
+                </div>
+                
+                <div class="orders-filter">
+                    <select id="order-status-filter" onchange="filterOrders()">
+                        <option value="">All Orders</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Amount (Rs.)</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                    </tbody>
+                </table>
+
+                <!-- Order Detail Modal -->
+                <div id="order-detail-modal" class="modal" style="display:none;">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeOrderModal()">&times;</span>
+                        <h2>Order Details</h2>
+                        <div id="order-detail-content"></div>
+                        <div class="modal-actions">
+                            <select id="order-status-select">
+                                <option value="">Update Status</option>
+                                <option value="confirmed">Confirm</option>
+                                <option value="shipped">Mark Shipped</option>
+                                <option value="delivered">Mark Delivered</option>
+                                <option value="cancelled">Cancel</option>
+                            </select>
+                            <button onclick="updateOrderStatus()" class="btn btn-primary">Update</button>
+                            <button onclick="closeOrderModal()" class="btn">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Management -->
+            <div id="customers" class="admin-section">
+                <div class="page-header">
+                    <h1>Customer Management</h1>
+                    <p>View and manage customer information</p>
+                </div>
+                <table class="customers-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Orders</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customers-table-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Reports -->
+            <div id="reports" class="admin-section">
+                <div class="page-header">
+                    <h1>Sales Reports</h1>
+                    <p>Analyze your business performance and trends</p>
+                </div>
+                
+                <div class="report-filters">
+                    <select id="report-period" onchange="generateReport()">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="report-summary">
+                    <div class="report-card">
+                        <h3>Total Orders</h3>
+                        <p id="report-total-orders">0</p>
+                    </div>
+                    <div class="report-card">
+                        <h3>Total Revenue</h3>
+                        <p id="report-total-revenue">Rs. 0</p>
+                    </div>
+                    <div class="report-card">
+                        <h3>Average Order Value</h3>
+                        <p id="report-avg-value">Rs. 0</p>
+                    </div>
+                </div>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Orders</th>
+                            <th>Revenue (Rs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="Images/logo.jpg" alt="S.S BAGS" class="footer-logo-img">
+                        <h3>S.S BAGS Admin</h3>
+                    </div>
+                    <p>Secure admin panel for managing your premium bags store.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#" onclick="showAdminSection('dashboard', event)">Dashboard</a></li>
+                        <li><a href="#" onclick="showAdminSection('products', event)">Products</a></li>
+                        <li><a href="#" onclick="showAdminSection('orders', event)">Orders</a></li>
+                        <li><a href="#" onclick="showAdminSection('customers', event)">Customers</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>System Info</h4>
+                    <p><i class="fas fa-server"></i> Server Status: Online</p>
+                    <p><i class="fas fa-database"></i> Database: Connected</p>
+                    <p><i class="fas fa-clock"></i> Last Sync: Just now</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 S.S BAGS Admin Panel. All rights reserved. Designed with  in Pakistan</p>
+            </div>
+        </footer>
+    </section>
+
+    <script src="../js/AdminPannel.js"></script>
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+    </script>
+</body>
+</html>
