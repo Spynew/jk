@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
 import os
 from dotenv import load_dotenv
 
@@ -40,20 +41,18 @@ app.include_router(admin.router)
 
 # Additional endpoints
 @app.get("/api/categories")
-async def get_categories():
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    
+async def get_categories(db=Depends(get_db)):
     try:
-        cursor.execute("SELECT id, name FROM categories WHERE status = 'active' ORDER BY name")
-        categories = cursor.fetchall()
+        result = db.execute(text("SELECT id, name FROM categories WHERE status = 'active' ORDER BY name"))
+        categories = []
+        for row in result:
+            categories.append({
+                "id": row[0],
+                "name": row[1]
+            })
         return {"categories": categories}
     except Exception as e:
-        from fastapi import HTTPException
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @app.get("/health")
 async def health_check():

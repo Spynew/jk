@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
-from datetime import datetime
+from datetime import datetime, timedelta
+from sqlalchemy import text
 from ..database import get_db
 from ..models import AdminLogin
 from ..auth import hash_password, verify_password, create_token, verify_token
@@ -18,19 +19,17 @@ async def admin_login_options():
     return response
 
 @router.post("/login")
-async def admin_login(admin: AdminLogin):
+async def admin_login(admin: AdminLogin, db=Depends(get_db)):
     print(f"Admin login attempt for: {admin.email}")
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
     
     try:
-        cursor.execute("SELECT id, email, password, role FROM admins WHERE email = %s", (admin.email,))
-        db_admin = cursor.fetchone()
+        result = db.execute(text("SELECT id, email, password, role FROM admins WHERE email = :email"), {"email": admin.email})
+        db_admin = result.fetchone()
         
-        if not db_admin or not verify_password(admin.password, db_admin['password']):
+        if not db_admin or not verify_password(admin.password, db_admin[2]):
             raise HTTPException(status_code=401, detail="Invalid admin credentials")
         
-        token = create_token({"sub": str(db_admin['id']), "role": db_admin['role']})
+        token = create_token({"sub": str(db_admin[0]), "role": db_admin[3]})
         
         return {"token": token, "message": "Admin login successful"}
     except HTTPException:
@@ -38,126 +37,112 @@ async def admin_login(admin: AdminLogin):
     except Exception as e:
         print(f"Database error in admin login: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @router.get("/stats/users")
-async def get_users_stats(payload=Depends(require_admin)):
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    
+async def get_users_stats(payload=Depends(require_admin), db=Depends(get_db)):
     try:
-        cursor.execute("SELECT COUNT(*) as count FROM users")
-        result = cursor.fetchone()
-        return result
+        result = db.execute(text("SELECT COUNT(*) as count FROM users"))
+        count = result.fetchone()
+        return {"count": count[0]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @router.get("/stats/products")
-async def get_products_stats(payload=Depends(require_admin)):
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    
+async def get_products_stats(payload=Depends(require_admin), db=Depends(get_db)):
     try:
-        cursor.execute("SELECT COUNT(*) as count FROM products")
-        result = cursor.fetchone()
-        return result
+        result = db.execute(text("SELECT COUNT(*) as count FROM products"))
+        count = result.fetchone()
+        return {"count": count[0]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @router.get("/stats/orders")
-async def get_orders_stats(payload=Depends(require_admin)):
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    
+async def get_orders_stats(payload=Depends(require_admin), db=Depends(get_db)):
     try:
-        cursor.execute("SELECT COUNT(*) as count, COALESCE(SUM(total_amount), 0) as total_sales FROM orders WHERE status IN ('confirmed', 'shipped', 'delivered')")
-        result = cursor.fetchone()
-        return result
+        result = db.execute(text("SELECT COUNT(*) as count, COALESCE(SUM(total_amount), 0) as total_sales FROM orders WHERE status IN ('confirmed', 'shipped', 'delivered')"))
+        stats = result.fetchone()
+        return {"count": stats[0], "total_sales": float(stats[1])}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @router.get("/customers")
-async def get_customers(payload=Depends(require_admin)):
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    
+async def get_customers(payload=Depends(require_admin), db=Depends(get_db)):
     try:
-        cursor.execute(
-            "SELECT u.id, u.name, u.email, u.phone, COUNT(o.id) as order_count FROM users u LEFT JOIN orders o ON u.id = o.user_id GROUP BY u.id, u.name, u.email, u.phone"
-        )
-        customers = cursor.fetchall()
+        result = db.execute(text("""
+            SELECT u.id, u.name, u.email, u.phone, COUNT(o.id) as order_count 
+            FROM users u 
+            LEFT JOIN orders o ON u.id = o.user_id 
+            GROUP BY u.id, u.name, u.email, u.phone
+        """))
+        
+        customers = []
+        for row in result:
+            customers.append({
+                "id": row[0],
+                "name": row[1],
+                "email": row[2],
+                "phone": row[3],
+                "order_count": row[4]
+            })
+        
         return {"customers": customers}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @router.put("/customers/{customer_id}")
-async def deactivate_customer(customer_id: int, update: dict, payload=Depends(require_admin)):
-    conn = get_db()
-    cursor = conn.cursor()
+async def deactivate_customer(customer_id: int, update: dict, payload=Depends(require_admin), db=Depends(get_db)):
     admin_id = int(payload.get("sub"))
     
     try:
-        cursor.execute("UPDATE users SET status = %s WHERE id = %s", (update.get("status"), customer_id))
+        db.execute(text("UPDATE users SET status = :status WHERE id = :customer_id"), {
+            "status": update.get("status"),
+            "customer_id": customer_id
+        })
         
-        cursor.execute(
-            "INSERT INTO activity_logs (admin_id, action, details) VALUES (%s, %s, %s)",
-            (admin_id, f"Customer {customer_id} deactivated", f"Status: {update.get('status')}")
-        )
+        # Note: activity_logs table doesn't exist in our schema, so we'll skip this for now
         
-        conn.commit()
+        db.commit()
         return {"message": "Customer updated"}
     except Exception as e:
-        conn.rollback()
+        db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @router.get("/reports")
-async def get_reports(period: str = "daily", payload=Depends(require_admin)):
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    
+async def get_reports(period: str = "daily", payload=Depends(require_admin), db=Depends(get_db)):
     try:
         if period == "monthly":
+            # SQLite doesn't have DATE_FORMAT or DATE_SUB, so we'll use SQLite functions
             query = """
-                SELECT DATE_FORMAT(created_at, '%Y-%m-01') as date, 
+                SELECT strftime('%Y-%m-01', created_at) as date, 
                        COUNT(*) as orders, 
                        COALESCE(SUM(total_amount), 0) as revenue 
                 FROM orders 
                 WHERE status IN ('confirmed', 'shipped', 'delivered')
-                AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
-                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+                AND created_at >= date('now', '-12 months')
+                GROUP BY strftime('%Y-%m', created_at)
                 ORDER BY date DESC
             """
         else:  # daily
             query = """
-                SELECT DATE(created_at) as date, 
+                SELECT date(created_at) as date, 
                        COUNT(*) as orders, 
                        COALESCE(SUM(total_amount), 0) as revenue 
                 FROM orders 
                 WHERE status IN ('confirmed', 'shipped', 'delivered')
-                AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-                GROUP BY DATE(created_at)
+                AND created_at >= date('now', '-7 days')
+                GROUP BY date(created_at)
                 ORDER BY date DESC
             """
         
-        cursor.execute(query)
-        report_data = cursor.fetchall()
+        result = db.execute(text(query))
+        report_data = []
+        
+        for row in result:
+            report_data.append({
+                "date": row[0],
+                "orders": row[1],
+                "revenue": float(row[2])
+            })
         
         total_orders = sum(r['orders'] for r in report_data)
         total_revenue = sum(float(r['revenue']) for r in report_data)
@@ -170,6 +155,3 @@ async def get_reports(period: str = "daily", payload=Depends(require_admin)):
     except Exception as e:
         print(f"Report error: {str(e)}")
         return {"report_data": [], "total_orders": 0, "total_revenue": 0}
-    finally:
-        cursor.close()
-        conn.close()
