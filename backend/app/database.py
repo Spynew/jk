@@ -1,44 +1,36 @@
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from mysql.connector import Error
+from mysql.connector.pooling import MySQLConnectionPool
 from dotenv import load_dotenv
-from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_CONFIG = {
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'user': os.getenv('DB_USER', 'root'),
+    'password': os.getenv('DB_PASSWORD', 'root'),
+    'database': os.getenv('DB_NAME', 'ss_bags'),
+    'port': int(os.getenv('DB_PORT', 3306))
+}
 
-if not DATABASE_URL:
-    DB_HOST = os.getenv("DB_HOST")
-    DB_PORT = os.getenv("DB_PORT", "21578")
-    DB_USER = os.getenv("DB_USER")
-    DB_PASSWORD = os.getenv("DB_PASSWORD")
-    DB_NAME = os.getenv("DB_NAME")
-    DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?ssl_mode=REQUIRED"
-
-print(f"Using DATABASE_URL: {DATABASE_URL}")
-
+# Initialize connection pool
 try:
-    engine = create_engine(
-        DATABASE_URL,
+    db_pool = MySQLConnectionPool(
+        pool_name="mypool",
         pool_size=10,
-        pool_recycle=3600,
-        pool_pre_ping=True,
-        connect_args={"ssl": {"ssl_mode": "REQUIRED"}}
+        pool_reset_session=True,
+        **DATABASE_CONFIG
     )
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    Base = declarative_base()
-    print("Database engine created successfully")
-except Exception as e:
-    print(f"Database connection failed: {str(e)}")
-    raise
+    print("Database connection pool created successfully")
+except Error as e:
+    print(f"Error creating connection pool: {e}")
+    exit(1)
 
-# Yeh function main.py mein import ho raha hai
 def get_db():
-    db = SessionLocal()
     try:
-        yield db
-    finally:
-        db.close()
+        conn = db_pool.get_connection()
+        conn.autocommit = False
+        return conn
+    except Error as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
