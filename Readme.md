@@ -1,3 +1,4 @@
+
 # SS Bags E-commerce Platform
 
 A complete e-commerce solution for bags and accessories with FastAPI backend and vanilla JavaScript frontend.
