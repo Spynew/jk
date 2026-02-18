@@ -16,11 +16,11 @@ DATABASE_CONFIG = {
 # Initialize connection pool
 try:
     db_pool = MySQLConnectionPool(
-        pool_name="mypool",
-        pool_size=10,
-        pool_reset_session=True,
-        **DATABASE_CONFIG
-    )
+    pool_name="mypool",
+    pool_size=3,   # <<< IMPORTANT FIX
+    pool_reset_session=True,
+    **DATABASE_CONFIG
+)
     print("Database connection pool created successfully")
 except Error as e:
     print(f"Error creating connection pool: {e}")
